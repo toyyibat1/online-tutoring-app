@@ -5,9 +5,7 @@ const controller = require("../controllers/admin.controller");
 
   router.patch("/subject/:subjectId", authJwt.verifyToken, authJwt.isAdmin, controller.updateSubjectById); //update all subject by Id
   router.get("/subject", authJwt.verifyToken, authJwt.isAdmin,  controller.findAllSubjects); //retrieve all subjects
-  // router.post("/subject/:id",authJwt.verifyToken, controller.createSubject); // 
   router.post("/subject/:id",authJwt.verifyToken, controller.createSubjectInCategory); // 
-
 
   router.get("/tutors", authJwt.verifyToken, authJwt.isAdmin, controller.getAllTutors); //get all tutors
   router.get("/tutor/:id", authJwt.verifyToken, authJwt.isAdmin, controller.getTutorById); //get all tutors by id
