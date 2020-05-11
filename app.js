@@ -35,10 +35,10 @@ app.listen(PORT, () => {
 });
 
 mongoose
-  .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+  .connect("mongodb+srv://tutoringapp:1Toyyibat@cluster0-fd7rl.mongodb.net/test?retryWrites=true&w=majority",
+    {useNewUrlParser: true,
+    useUnifiedTopology: true}
+  )
   .then(() => {
     console.log("Successfully connect to MongoDB.");
     
