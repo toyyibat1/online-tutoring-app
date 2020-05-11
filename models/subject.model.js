@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const subjectSchema = new Schema({
     name:{type: String},
     tutors:{type: mongoose.Schema.Types.ObjectId, ref: "User"},
-    category: {type: String, required: true },
+    user:{type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    category: {type: mongoose.Schema.Types.ObjectId, ref: "Category"},
     timeStamp: {type: Date, default: Date.now}
 });
 

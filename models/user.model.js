@@ -7,7 +7,6 @@ const userSchema = new Schema({
     username: {type: String, required: true},
     email: {type: String, required: true},
     password: {type: String,required: true},
-    categories: {type: Schema.Types.ObjectId, ref: 'Category'},
     subjects: [{type: Schema.Types.ObjectId, ref: 'Subject'}],
     lessons: [{type: Schema.Types.ObjectId, ref: 'Lesson'}],
     role: {type:String, enum: ['student', 'tutor', 'admin'], default: 'student'}}, {timestamps: true });

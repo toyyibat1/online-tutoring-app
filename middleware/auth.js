@@ -3,7 +3,6 @@ const User = require('../models/user.model');
 
 verifyToken = (req, res, next) => {
     let token = req.headers["x-access-token"];
-  
     if (!token) {
       return res.status(403).send({ message: "No token provided!" });
     }
@@ -17,27 +16,28 @@ verifyToken = (req, res, next) => {
   };
 
   isAdmin = async(req, res, next) => {
-        user = await User.findOne({role: "admin"})
-        const role = user.role
-          if(role !== 'admin'){
+    try{
+      const token = req.body.token
+      user = await User.findOne({accessToken: token})
+          if(user !== 'admin'){
               return res.status(401).json({
-                  error: "you dont have access"
+                  error: "only admin has access to this route"
               })
           }
           next();
-      } 
-      
+        }catch(err){
+          next(err)
+        }
+        }
  isTutor = async (req, res, next) => {
   try{
     const token = req.body.token
   user = await User.findOne({accessToken: token})
-    const role = user.role
-    if(role != 'tutor'){
+    if(user != 'tutor'){
       return res.status(401).send({
         date: false, 
         message: "only tutors can access this route"
       })
-
     }
     next();
 }catch(err){
@@ -48,8 +48,7 @@ isUser = async (req, res, next) => {
 try{
   const token = req.body.token
 user = await User.findOne({accessToken: token})
-  const role = user.role
-  if(!role){
+  if(!user){
     return res.status(401).send({
       date: false, 
       message: "Only users of the app can acess this route"
