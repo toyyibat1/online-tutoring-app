@@ -24,6 +24,14 @@ app.use(express.urlencoded({ extended: false }));
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.use('/api/v1', userRoutes);
+app.use('/api/v1', authRoutes);
+app.use('/api/v1', subjectRoutes);
+app.use('/api/v1', categoryRoutes);
+app.use('/api/v1', lessonRoutes);
+app.use('/api/v1', tutorRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to tutoring application." });
@@ -54,15 +62,5 @@ mongoose
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
-  
- app.use(bodyParser.json());
-
-app.use('/api/v1', userRoutes);
-app.use('/api/v1', authRoutes);
-app.use('/api/v1', subjectRoutes);
-app.use('/api/v1', categoryRoutes);
-app.use('/api/v1', lessonRoutes);
-app.use('/api/v1', tutorRoutes);
-
 
 module.exports = app;

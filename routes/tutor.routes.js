@@ -3,9 +3,7 @@ const router = express.Router();
 const { authJwt } = require("../middleware/auth");
 const controller = require("../controllers/tutor.controller");
 
-router.get('/subject/:categoryId', controller.findSubjectInCategory)
-router.get('/categories', controller.findAllCategories)
-router.get('/subjectName', controller.searchSubjectByName)
-router.get('/tutorName', controller.searchTutorByName)
+
+// router.post('/subject/register', controller.findSubject);
 
 module.exports = router;

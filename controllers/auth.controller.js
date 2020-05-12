@@ -35,7 +35,7 @@ exports.signup = (req, res, next) => {
       .catch(err => console.log(err));
   })};
 
-  exports.login = (req, res, next) => {
+  exports.signin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     User.findOne({ email })

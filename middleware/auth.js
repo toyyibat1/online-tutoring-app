@@ -16,19 +16,16 @@ verifyToken = (req, res, next) => {
   };
 
   isAdmin = async(req, res, next) => {
-    try{
-      const token = req.body.token
-      user = await User.findOne({accessToken: token})
-          if(user !== 'admin'){
-              return res.status(401).json({
-                  error: "only admin has access to this route"
-              })
-          }
-          next();
-        }catch(err){
-          next(err)
-        }
-        }
+    user = await User.findOne({role: "admin"})
+    const role = user.role
+      if(role !== 'admin'){
+          return res.status(401).json({
+              error: "only admin has access to this route dont have access"
+          })
+      }
+      next();
+  }
+
  isTutor = async (req, res, next) => {
   try{
     const token = req.body.token

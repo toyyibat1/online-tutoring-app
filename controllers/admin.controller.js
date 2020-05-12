@@ -23,7 +23,7 @@ module.exports = {
       res.json(err);
     });
 },
-
+//can create subjects under 3 categories: primary, JSS, SSS
 createSubjectInCategory : async (req, res) => {
   console.log(req.params);
   category= req.params;
@@ -31,8 +31,10 @@ createSubjectInCategory : async (req, res) => {
   const {name} = req.body;
   const subject = await Subject.create({
     name,
+    categoryid: id
   });
 await subject.save();
+
 const categoryById = await Category.findById(id);
 
 categoryById.subjects.push(subject)
@@ -40,40 +42,17 @@ await categoryById.save();
 
 return res.send(categoryById);
 },
-
-createSubject : async (req, res) => {
-  console.log(req.params);
-  user= req.params;
-  id = user.id
-  const {name} = req.body;
-  const subject = await Subject.create({
-    name,
-    user: id
-  });
-await subject.save();
-const userById = await User.findById(id);
-
-userById.subjects.push(subject)
-await userById.save();
-
-return res.send(userById);
+getsubjectInCategory: async (req, res) => {
+  const {id} = req.params;
+  const getSubject = await (await Category.findById(id)).populate('subject');
+  res.send(getSubject);
 },
+
 categoryBySubject: async (req, res) => {
   const {id} = req.params;
   const categoryBySubject = await (await Subject.findById(id)).populate('subject');
   res.send(categoryBySubject);
 },
-  // createSubject :async (req, res) => {
-  //   const {name, category} = req.body
-  //   const subject = new Subject({
-  //     name,
-  //     category: category,
-  //   });
-  //   subject.save(function(err){
-  //     if(err) return handleError(err);
-  //   });
-  
-  // },
   findAllSubjects :(req, res) => {     
     Subject.find({})
         .then(subject => {
@@ -86,27 +65,63 @@ categoryBySubject: async (req, res) => {
         });
   },
   
-  updateSubjectById : (req, res) => {
-      const subject = new Subject({
-        _id: req.params.id,
-        name: req.body.name
-       });
-     Subject.updateOne({_id: req.params.id}, subject).then(
-        () => {
-          res.status(201).json({
-            message: 'Subject updated successfully!'
-          });
+  updateSubjectById : (req, res, next ) =>{
+    const{name} = req.body
+    const {subjectId} = req.params
+      Subject.findById(subjectId)
+      .then( result =>{
+        if(!result){
+          return res
+          .status(404).send({ status: false, message: "Subject not found"});
+        } else{
+          Subject.findByIdAndUpdate(subjectId, {name}, { new: true } ).then( () =>{
+            Subject.findById(subjectId)
+            .then( subject =>{
+              return res.status(200).send({message: "subject updated successfully",
+           subject})
+            })
+          })
         }
-      ).catch(
-        (error) => {
-          res.status(400).json({
-            error: error
-          });
-        }
-      );
-    },
+      }).catch(err => console.log(err))
+  },
+  // updateSubjectById : (req, res) => {
+  //     const subject = new Subject({
+  //       _id: req.params.id,
+  //       name: req.body.name
+  //      });
+  //    Subject.updateOne({_id: req.params.id}, subject).then(
+  //       () => {
+  //         res.status(201).json({
+  //           message: 'Subject updated successfully!'
+  //         });
+  //       }
+  //     ).catch(
+  //       (error) => {
+  //         res.status(400).json({
+  //           error: error
+  //         });
+  //       }
+  //     );
+  //   },
 
 //delete subject
+deleteSubjectById: async (req, res) => {
+  console.log(req.params);
+  category= req.params;
+  id = category.id
+  const {subjectId} = req.body;
+  const subject = await Subject.findById({
+    subjectId,
+  });
+await Subject.findByIdAndDelete(subjectId);
+
+const categoryById = await Category.update({$pull: { "subjects": { $gte: subjectId }}});
+
+categoryById.subjects.pull(subject)
+await categoryById.save();
+
+return res.send(categoryById);
+},
 deleteSubject : (req, res) =>{
 Subject.deleteOne({_id: req.params.id}).then(
   (subject) => {res.status(200).json({message: ' Subject Deleted!', subject});
@@ -150,45 +165,54 @@ deleteTutorById : (req, res) => {
   ).catch((e)=> res.status(400).send(e))
   },
 
-createLesson: async(req, res, next)=> {
+createLesson: async (req, res, next)=> {
     try {
-      const { subjectName, categoryName, tutorName, studentName } = req.body
-        const studentRole = await User.findOne({username: studentName, role:'student'})
-            if(!studentRole){
-              return res
-              .status(404).send({message: "No student is found"})
-            }   
-        const subject = await Subject.findOne({name: subjectName})
+      const {name, subjectName, tutorName, studentName } = req.body
+           
+        const subject = await Subject.findOne({name:subjectName})
             if(!subject){
               return res
               .status(404).send({message: "No subject is found"})
               }         
             
-        const tutorRole = await User.findOne({username:tutorName, role:'tutor'})
+        const tutorRole = await User.findOne({username:tutorName})
             if(!tutorRole){
               return res.status(404).send({message: "No tutor is found"})
             }
-            const category = await Category.findOne({name: categoryName})
-            if(!category){
-              return res 
-              .status(404).json({status: false, message: "Invalid category Name"})
-            }  
-      const ifLesson = await Lesson.findOne({studentName, subjectName, categoryName, tutorName})
-            if(ifLesson){
+        const studentRole = await User.findOne({username: studentName})
+        if(!studentRole){
+          return res
+          .status(404).send({message: "No student is found"})
+        }
+        
+      const findlesson = await Lesson.findOne({
+        name,
+        studentName,
+        subjectName, 
+        tutorName, 
+        })
+            if(findlesson){
               return res.status(400)
                 .send({
                     status: false,
                     message: 'You cant create a book a new lesson. this lesson already exist.'
                 })
             }
-        const lesson = new Lesson({studentName, subjectName, categoryName, tutorName});
+        const lesson = new Lesson({
+          name,
+          studentName,
+          subjectName, 
+          tutorName, 
+          });
         await lesson.save();
 
-        studentRole.lessons = studentRole.lessons.push(lesson._id);
-            await studentRole.save();
+        const tutorLesson = await User.findOne( {username: tutorName});
+        tutorLesson.lessons.push(lesson)
+          await tutorLesson.save();
 
-        tutorRole.lessons = tutorRole.lessons.push(lesson._id)
-            await tutorRole.save();
+          const studentLesson = await User.findOne( {username: studentName});
+        studentLesson.lessons.push(lesson)
+          await studentLesson.save();
 
         res.status(200)
             .send({
@@ -223,10 +247,13 @@ createLesson: async(req, res, next)=> {
     );
   },  
 updateLesson : (req, res) => {
+  const {name, studentName, tutorName,subjectName} = req.body
   const lesson = new Lesson({
     _id: req.params.id,
-    username: req.body.name,
-    type: req.body.type
+    name,
+    studentName,
+    tutorName, 
+    subjectName 
   });
 
  Lesson.updateOne({_id: req.params.id}, lesson).then(
@@ -247,7 +274,7 @@ deleteLesson : (req, res, next) =>{
  Lesson.deleteOne({_id: req.params.id}).then(
     () => {
       res.status(200).json({
-        message: 'Deleted!'
+        message: 'Lesson Deleted!'
       });
     }
   ).catch(
@@ -259,22 +286,7 @@ deleteLesson : (req, res, next) =>{
   );
 }
 }
-//   findSubjectBySubjectId : async (req, res) => {
-//     Subject.find({category: primary._id}).exec(function(err, subjects){
-//       if(err) return handleError(err);
-//       res.json(subjects)
-//     })
-//   },
-//   findAllSubjects : async(req, res) => {
-//     const name = req.params
-//     const subject = await Subject.find(name)
-//     return res.send(subject)
-// },
-// findSubjectByCategoryName :  async(req, res) => {
-//   const subjects = req.params.subjects
-//   const subject = await Category.find({subjects}, null, {sort: {name: 1}})
-//     return res.send(subject)
-// },
+
 // findByName :  async(req, res) => {
 //   console.log(req.params) 
 //   Subject.findOne({name: req.params.name}, null, {sort: {name: 1}})

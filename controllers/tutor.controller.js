@@ -4,47 +4,42 @@ const Subject = require('../models/subject.model');
 const Lesson = require('../models/lesson.model');
 
 module.exports = {
-  findSubjectInCategory : async (req, res) => {
-      console.log(req.params)
-      id = req.params
-     await Category.findOne({category: id._id }).populate('subjects')
-      .exec(function (err, subject) {
-      if (err) return handleError(err);
-      res.json(subject)
-    });
-  
-  },
-  // subjectById: async (req, res) => {
-  //   const {id} = req.params;
-  //   const categoryBySubject = await (await Subject.findById(id)).populate('subject');
-  //   res.send(categoryBySubject);
-  // },
-  
-  //retrieve all categories
-  findAllCategories : async (req, res) => {
-    await Category.find({})
-     .exec(function (err, subject) {
-     if (err) return handleError(err);
-     res.json(subject)
-   });
-   },
-  searchSubjectByName : (req, res, next ) =>{
-    Subject.find().sort({ name : 1 })
-    .then( result =>{
-      res.status(200).send({
-        status: true,
-        message: result
-      })
-    })
-  },
-  searchTutorByName : (req, res, next ) =>{  
-    var mysort = { firstname: 1 };
-    User.find({role: 'tutor'}).sort(mysort)
-    .then( tutor =>{
-      res.status(200).send({
-        status: true,
-        message: tutor
-      })
-    })
-  }
+  // findSubject: async (req, res, next)=> {
+  //   try {
+  //     const {name, tutorId} = req.body    
+  //       const subject = await Subject.findOne({name})
+  //           if(!subject){
+  //             return res
+  //             .status(404).send({message: "No subject already exist"})
+  //             }        
+            
+  //       const tutorRole = await User.findById({_id:tutorId})
+  //           if(!tutorRole){
+  //             return res.status(404).send({message: "No tutor is found"})
+  //           }
+
+  //         const newSubject = new Subject({
+  //           name, 
+  //           tutorId
+  //         })
+  //         newSubject.save()
+
+  //           const findSubject = await Subject.findOneAndUpdate(name);
+  //           findSubject.tutors.push(tutor)
+  //             await findSubject.save();
+    
+  //             const findTutor = await User.findByIdAndUpdate(tutorId, {username: studentName});
+  //             findTutor.subjects.push(name)
+  //             await findTutor.save(); 
+              
+  //             const registesubject = await Subject.findOne(name);
+  //      res.json({
+  //        message: "subjects registered successfully",
+  //        data: registesubject,
+  //      })
+  //   }catch(error){
+  //       res.status(400)
+  //           .send({message: error});
+  //   }
+  // }
 }
