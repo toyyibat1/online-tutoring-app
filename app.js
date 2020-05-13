@@ -6,9 +6,7 @@ const cors = require("cors");
 const dbConfig = require("./config/db.config");
 const userRoutes = require('./routes/user.routes');
 const authRoutes = require('./routes/auth.routes');
-const subjectRoutes = require('./routes/subject.routes');
-const categoryRoutes = require('./routes/admin.routes');
-const lessonRoutes = require('./routes/lesson.routes');
+const adminRoutes = require('./routes/admin.routes');
 const tutorRoutes = require('./routes/tutor.routes');
 
 var corsOptions = {
@@ -28,9 +26,7 @@ app.use(bodyParser.json());
 
 app.use('/api/v1', userRoutes);
 app.use('/api/v1', authRoutes);
-app.use('/api/v1', subjectRoutes);
-app.use('/api/v1', categoryRoutes);
-app.use('/api/v1', lessonRoutes);
+app.use('/api/v1', adminRoutes);
 app.use('/api/v1', tutorRoutes);
 
 app.get("/", (req, res) => {

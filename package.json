@@ -2,8 +2,8 @@
   "name": "online-tutoring",
   "version": "1.0.0",
   "engines": {
-    "node": "10.16.0",
-    "npm": "6.9.0"
+    "node": "12.x",
+    "npm": "6.x"
   },
   "description": "endpoints for an online tutorial app",
   "main": "index.js",
