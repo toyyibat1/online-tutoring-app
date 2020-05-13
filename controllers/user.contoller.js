@@ -46,7 +46,7 @@ module.exports = {
   searchTutorByName : (req, res, next ) =>{ 
     const {name} = req.params 
     var mysort = { firstname: 1 };
-    User.find({username: name}).where({role: 'tutor'}).sort(mysort)
+    User.find({firstname: name}).where({role: 'tutor'}).sort(mysort)
     .then( tutor =>{
       res.status(200).send({
         status: true,
